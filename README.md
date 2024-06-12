@@ -1,1 +1,1 @@
-# Jenkins-Sample-Project
+# Jenkins-Java-Project
