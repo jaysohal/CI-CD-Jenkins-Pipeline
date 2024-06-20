@@ -1,58 +1,54 @@
-pipeline {
+pipeline{
     agent any
-    
-    tools {
-        maven 'maven-3.9.7'
+    tools{
+        maven 'maven-3.9'
     }
-    
-    stages {
-        stage('Git Checkout') {
-            steps {
-                git url: 'https://github.com/jaysohal/CI-CD-Jenkins-Pipeline.git', branch: 'main'
+    stages{
+        stage('Git Checkout'){
+            steps{
+                git url: 'https://github.com/jaysohal/CI-CD-Jenkins-Pipeline.git' ,branch: 'main'
             }
         }
-        
-        stage('Build Maven Application') {
-            steps {
-                 sh 'mvn clean install'
+        stage('Build Maven Application'){
+            steps{
+                sh 'mvn clean package'
             }
         }
-        
-        stage('Generate SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('sonarqube') {
+        stage('Generate Sonarqube Analysis'){
+            steps{
+                withSonarQubeEnv(installationName: 'sonarqube-8', credentialsId: 'jenkins-sonar-access'){
                     sh 'mvn sonar:sonar'
                 }
             }
         }
-        
-        stage('Upload War file to Nexus') {
-            steps {
+        stage('Upload war File To Nexus'){
+            steps{
                 nexusArtifactUploader artifacts: [
                     [
                         artifactId: 'HelloWorldWebApp', 
                         classifier: '', 
-                        file: 'target/HelloWorldWebApp-1.0-SNAPSHOT.war', 
+                        file: 'target/HelloWorldWebApp-0.9.war', 
                         type: 'war'
                     ]
                 ], 
                 credentialsId: 'jenkins-nexus-access', 
                 groupId: 'com.example', 
-                nexusUrl: '15.157.10.88:8081',
+                nexusUrl: '15.157.10.88:8081', 
                 nexusVersion: 'nexus3', 
                 protocol: 'http', 
                 repository: 'HelloWorldWebApp', 
-                version: '1.0-SNAPSHOT'
+                version: '0.9'
             }
         }
-        
-        stage('Deploy War file to Tomcat') {
-            steps {
-                sshagent(['jenkins-tomcat_ssh-access']) {
+        stage('Deploy war file to Tomcat'){
+            steps{
+                sshagent(['jenkins-tomcat-ssh-access']) {
                     sh """
-                        scp -o StrictHostKeyChecking=no target/hiring.war ubuntu@35.182.59.183:/opt/apache9/webapps
+                    
+                        scp -o StrictHostKeyChecking=no target/*.war ubuntu@35.182.59.183:/opt/tomcat-9/webapps
                         ssh -o StrictHostKeyChecking=no ubuntu@35.182.59.183 /opt/tomcat-9/bin/shutdown.sh
                         ssh -o StrictHostKeyChecking=no ubuntu@35.182.59.183 /opt/tomcat-9/bin/startup.sh
+                   
                     """
                 }
             }
