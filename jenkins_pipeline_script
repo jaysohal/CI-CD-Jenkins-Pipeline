@@ -18,7 +18,8 @@ pipeline {
             steps {
                 echo '****************************************************************'
                 echo 'Checkout code started from Github'
-                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/jaysohal/CI-CD-Jenkins-Pipeline.git']])
+                git branch: 'main', changelog: false, url: 'https://github.com/jaysohal/CI-CD-Jenkins-Pipeline.git'
+		
                 echo 'Checkout code done from Github'
             }
         }
