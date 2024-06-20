@@ -14,14 +14,14 @@ pipeline {
         
         stage('Build Maven Application') {
             steps {
-                sh "${MAVEN_HOME}/bin/mvn clean package"
+                 sh 'mvn clean install'
             }
         }
         
         stage('Generate SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonarqube-9.9.5.90363', credentialsId: 'jenkins-sonar-access') {
-                    sh "${MAVEN_HOME}/bin/mvn sonar:sonar"
+                    sh 'mvn sonar:sonar'
                 }
             }
         }
