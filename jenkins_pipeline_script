@@ -20,7 +20,7 @@ pipeline {
         
         stage('Generate SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('sonarqube-9.9.5.90363', credentialsId: 'jenkins-sonar-access') {
+                withSonarQubeEnv('sonarqube') {
                     sh 'mvn sonar:sonar'
                 }
             }
